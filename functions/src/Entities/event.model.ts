@@ -4,11 +4,13 @@ const { Collection } = require('fireorm');
 export class EventModel {
     id!: string
     title!: string
-/*    userId?: string
-    endorsements?: string*/
+    description!: string
+    userId?: string
+    votedByUsers!: string[]
     gravity!: number
-/*    latitude?: number
-    longitude?: number
-    createdAt?: string
-    approvedByUserId?: string*/
+    latitude!: number
+    longitude!: number
+    createdAt?: number
+    createdAtReadable!: string
+    approvedByUserId?: string | null
 }

@@ -11,9 +11,15 @@ const { Collection } = require('fireorm');
 let EventModel = class EventModel {
     id;
     title;
-    /*    userId?: string
-        endorsements?: string*/
+    description;
+    userId;
+    votedByUsers;
     gravity;
+    latitude;
+    longitude;
+    createdAt;
+    createdAtReadable;
+    approvedByUserId;
 };
 EventModel = __decorate([
     Collection()

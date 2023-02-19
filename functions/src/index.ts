@@ -2,43 +2,49 @@ import * as functions from "firebase-functions";
 import express from "express";
 import * as bodyParser from "body-parser";
 import cors from "cors";
-import {EventModel} from "./Entities/event.model"
 import * as fireorm from 'fireorm';
-import {getRepository} from "fireorm";
-const { v4: uuidv4 } = require('uuid');
+import {createUser} from "./Routes/Users/createUser";
+import {validateUserMiddle} from "./Middleware/validateUser";
+import {updateUser} from "./Routes/Users/updateUser";
+import {getUserInfo} from "./Routes/Users/getUserInfo";
+import {createEvent} from "./Routes/Events/createEvent";
+import {updateEvent} from "./Routes/Events/updateEvent";
+import {approveEvent} from "./Routes/Events/approveEvent";
+import {rejectOrDeleteEvent} from "./Routes/Events/rejectEvent";
+import {getCloseEvent} from "./Routes/Events/getCloseEvents";
+import {getEvents} from "./Routes/Events/getEvents";
+import {voteEvent} from "./Routes/Events/voteEvent";
 const app = express()
 app.use(cors({
         origin: '*',
     })
 )
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const admin = require('firebase-admin');
 admin.initializeApp();
 const firestore = admin.firestore();
+const auth = admin.auth()
 fireorm.initialize(firestore);
 
 
+//Validation Auth
+app.use(validateUserMiddle)
 
+//User
+app.post("/users",createUser)
+app.patch("/users",updateUser)
+app.get("/users",getUserInfo)
 
+//Events
+app.get("/events",getEvents)
+app.get("/events/:id/vote",voteEvent)
+app.post("/events",createEvent)
+app.post("/events/:id",updateEvent)
+app.get("/events/:id/approve",approveEvent)
+app.delete("/events/:id",rejectOrDeleteEvent)
+app.get("/events/close",getCloseEvent)
 
-
-app.get("/alert/create", (async (req, res) => {
-    let event = new EventModel()
-    console.log(event)
-    event.id = uuidv4();
-    event.title = "test"
-    event.gravity = 1
-    const eventRepository = getRepository(EventModel);
-    const eventDoc = await eventRepository.create(event).catch(e=>{
-        console.log(e)
-    });
-    console.log(eventDoc)
-    const retrieveEvent = await eventRepository.findById(eventDoc!.id);
-    console.log(retrieveEvent)
-    res.send({
-        message: "test"
-    })
-}))
 
 exports.api = functions.https.onRequest(app)
