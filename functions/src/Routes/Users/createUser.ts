@@ -21,7 +21,7 @@ export async function createUser(request: any, response: any) {
     user.latitude = body.latitude ? body.latitude : ""
     user.longitude = body.longitude ? body.longitude : ""
 
-    user.fcmToken = ""
+    user.fcmToken = body.fcmToken ? body.fcmToken :""
 
     let userRes = await userRepository.create(user).catch(e=>{
         console.log(e)
