@@ -42,12 +42,10 @@ export async function approveEvent(req: any, res: any) {
     let allUsers = await userRepository.find()
     allUsers =  allUsers.filter(user => {
         let distance = getDistanceFromLatLonInKm(event.latitude,event.longitude,user.latitude,user.longitude)
-        console.log(distance)
         return distance <=2
     })
     let fcmTokens = allUsers.map(user => user.fcmToken)
     fcmTokens = lodash.uniq(fcmTokens)
-    console.log(fcmTokens)
     if(fcmTokens.length >=1){
         const message = {
             notification: {

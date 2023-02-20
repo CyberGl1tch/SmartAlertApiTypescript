@@ -8,6 +8,7 @@ export async function getCloseEvent(req: any, res: any) {
     let maxDistance = req.query.maxDistance ? req.query.maxDistance : 1
     let longitude = req.query.longitude
     let latitude = req.query.latitude
+    let decodedUser = req.user
 
     if(!longitude || !latitude) return res.status(409).json({status: 409,message: "Missing core values"})
 
@@ -16,7 +17,7 @@ export async function getCloseEvent(req: any, res: any) {
     let events = await eventRepository.find()
 
     events = events.filter(event =>{
-        if(getDistanceFromLatLonInKm(latitude,longitude,event.latitude,event.longitude) <= maxDistance){
+        if(getDistanceFromLatLonInKm(latitude,longitude,event.latitude,event.longitude) <= maxDistance && event.userId !== decodedUser.user_id){
             return event
         }
     })

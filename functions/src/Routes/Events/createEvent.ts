@@ -21,7 +21,7 @@ export async function createEvent(req: any, res: any) {
     event.title = body.title
     event.description = body.description ? body.description : ""
     event.approvedByUserId = null
-    event.votedByUsers = []
+    event.votedByUsers = [decodedUser.user_id]
     event.createdAt = DateTime.now().toMillis()
     event.createdAtReadable = DateTime.now().toFormat("dd/LL/yyyy - HH:mm:ss")
 
