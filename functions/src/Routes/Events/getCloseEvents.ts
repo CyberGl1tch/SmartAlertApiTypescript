@@ -17,7 +17,7 @@ export async function getCloseEvent(req: any, res: any) {
     let events = await eventRepository.find()
 
     events = events.filter(event =>{
-        if(getDistanceFromLatLonInKm(latitude,longitude,event.latitude,event.longitude) <= maxDistance && event.userId !== decodedUser.user_id){
+        if(getDistanceFromLatLonInKm(latitude,longitude,event.latitude,event.longitude) <= maxDistance && event.userId !== decodedUser.user_id && !event.votedByUsers.includes(decodedUser.user_id)){
             return event
         }
     })
