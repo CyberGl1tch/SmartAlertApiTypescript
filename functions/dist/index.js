@@ -42,6 +42,7 @@ const rejectEvent_1 = require("./Routes/Events/rejectEvent");
 const getCloseEvents_1 = require("./Routes/Events/getCloseEvents");
 const getEvents_1 = require("./Routes/Events/getEvents");
 const voteEvent_1 = require("./Routes/Events/voteEvent");
+const notificationTest_1 = require("./Routes/Events/notificationTest");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
     origin: '*',
@@ -52,10 +53,12 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 const firestore = admin.firestore();
 const auth = admin.auth();
+const messaging = admin.messaging();
 fireorm.initialize(firestore);
 //Validation Auth
 app.use(validateUser_1.validateUserMiddle);
 //User
+app.get("/testNotification", notificationTest_1.notifyTest);
 app.post("/users", createUser_1.createUser);
 app.patch("/users", updateUser_1.updateUser);
 app.get("/users", getUserInfo_1.getUserInfo);

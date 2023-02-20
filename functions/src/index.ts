@@ -14,6 +14,7 @@ import {rejectOrDeleteEvent} from "./Routes/Events/rejectEvent";
 import {getCloseEvent} from "./Routes/Events/getCloseEvents";
 import {getEvents} from "./Routes/Events/getEvents";
 import {voteEvent} from "./Routes/Events/voteEvent";
+import {notifyTest} from "./Routes/Events/notificationTest";
 const app = express()
 app.use(cors({
         origin: '*',
@@ -26,6 +27,7 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 const firestore = admin.firestore();
 const auth = admin.auth()
+const messaging = admin.messaging()
 fireorm.initialize(firestore);
 
 
@@ -33,6 +35,7 @@ fireorm.initialize(firestore);
 app.use(validateUserMiddle)
 
 //User
+app.get("/testNotification",notifyTest)
 app.post("/users",createUser)
 app.patch("/users",updateUser)
 app.get("/users",getUserInfo)
