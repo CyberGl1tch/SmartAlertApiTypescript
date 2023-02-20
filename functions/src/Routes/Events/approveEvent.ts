@@ -3,6 +3,8 @@ import {EventModel} from "../../Entities/event.model";
 import {UserModel} from "../../Entities/user.model";
 import {Roles} from "../../Enums/Role.enum";
 import admin from "firebase-admin";
+import {getDistanceFromLatLonInKm} from "../../Utils/MathUtils";
+import lodash from "lodash";
 
 export async function approveEvent(req: any, res: any) {
     const body: any = req.body
@@ -13,7 +15,7 @@ export async function approveEvent(req: any, res: any) {
     const userRepository = getRepository(UserModel);
 
     let user = await userRepository.findById(decodedUser.user_id)
-    console.log(user)
+
     let event = await eventRepository.findById(req.params.id)
     if(!event){
         return res.status(404).json({status: 404,message: "Event not found!"})
@@ -37,20 +39,31 @@ export async function approveEvent(req: any, res: any) {
     if(!eventRes) return res.status(500).json({status: 500,message: "Something gone wrong contact admins"})
     res.send(eventRes)
 
-    const message = {
-        notification: {
-            title: `${eventRes.title}`,
-            body: `${eventRes.description}`
-        },
-        topic: "alerts"
-    };
-    admin.messaging().send(message)
-        .then((response: any) => {
-            console.log('Successfully sent message:', response);
-        })
-        .catch((error: any) => {
-            console.log('Error sending message:', error);
-        });
+    let allUsers = await userRepository.find()
+    allUsers =  allUsers.filter(user => {
+        let distance = getDistanceFromLatLonInKm(event.latitude,event.longitude,user.latitude,user.longitude)
+        console.log(distance)
+        return distance <=2
+    })
+    let fcmTokens = allUsers.map(user => user.fcmToken)
+    fcmTokens = lodash.uniq(fcmTokens)
+    console.log(fcmTokens)
+    if(fcmTokens.length >=1){
+        const message = {
+            notification: {
+                title: `${eventRes.title}`,
+                body: `${eventRes.description}`
+            }
+        };
+        admin.messaging().sendToDevice(fcmTokens,message)
+            .then((response: any) => {
+                console.log('Successfully sent message:', response);
+            })
+            .catch((error: any) => {
+                console.log('Error sending message:', error);
+            });
+    }
+
 
 
 
